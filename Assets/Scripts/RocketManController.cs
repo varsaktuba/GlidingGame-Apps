@@ -8,6 +8,7 @@ public class RocketManController : MonoBehaviour
     Rigidbody rb;
     [SerializeField]
     private float rotateValue;
+    public float forceSpeed;
     
 
     // Start is called before the first frame update
@@ -22,7 +23,7 @@ public class RocketManController : MonoBehaviour
     {
         if (StickController.isStickReleased)
         {
-           // RotateRocketman();
+           RotateRocketman();
             if (!oneTimer)
             {
                 oneTimer = true;
@@ -35,8 +36,7 @@ public class RocketManController : MonoBehaviour
     {
         gameObject.transform.parent = null;
         rb.isKinematic = false;
-        rb.AddForce(0, StickController.ReleaseForceForRocketman * 5000, StickController.ReleaseForceForRocketman * 5000);
-
+        rb.AddForce(0, StickController.ReleaseForceForRocketman * forceSpeed, StickController.ReleaseForceForRocketman * forceSpeed);
         GameManager.instance.ChangeCam();
     }
 

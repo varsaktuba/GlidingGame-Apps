@@ -16,11 +16,14 @@ public class GameManager : MonoBehaviour
         }
 
     }
-  
+
 
     public void ChangeCam()
     {
         mainCam.enabled = false;
         rocketManCam.enabled = true;
     }
+
+
+
 }
