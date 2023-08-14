@@ -4,15 +4,28 @@ using UnityEngine;
 
 public class StickController : MonoBehaviour
 {
-
+    public static StickController instance;
     public Animation anim;
+
     private float startTouch;
     private float swipeDelta;
-    float slideSpeed = 0.1f;
     private float swerveAmount = 0.0f;
-    Vector3 dir;
-    public static bool isStickReleased = false;
+    private float slideSpeed = 0.1f;
     public static float ReleaseForceForRocketman = 0f;
+    
+    
+    Vector3 dir;
+
+    public static bool isStickReleased = false;
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -36,10 +49,12 @@ public class StickController : MonoBehaviour
             BendStick();
         }
     }
-
+    /// <summary>
+    /// Stick release function. Calculate the touch position with swipes then release the stick.
+    /// </summary>
     public void BendStick()
     {
-        if (Input.touchCount > 0)
+        if (Input.touchCount > 0 && !GameManager.gameOver)
         {
 
 
@@ -51,39 +66,60 @@ public class StickController : MonoBehaviour
             if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary)
             {
                 swipeDelta = touch.position.x - startTouch;
-                //startTouch = touch.position.x;
+ 
 
-                swerveAmount = Time.deltaTime * dir.x;
+                swerveAmount =  dir.x *0.016f;
+    
 
                 dir.x = swipeDelta * slideSpeed;
+
                 if (dir.x < 0)
                     StickAnimationFrameJump(Mathf.Abs(swerveAmount) * anim["Armature|Bend_Stick"].length);
-
-             
             }
 
 
 
 
             if (touch.phase == TouchPhase.Ended)
-            {
-                ReleaseForceForRocketman = Mathf.Clamp(Mathf.Abs(swerveAmount), 0.1f, 1.2f);
-                swipeDelta = 0;
 
-                anim["Armature|Bend_Stick"].speed = 1;
-                anim.Play("Armature|Release_Stick");
-                isStickReleased = true;
+            {
+                StickAnimationFrameJump(Mathf.Abs(swerveAmount) * anim["Armature|Bend_Stick"].length);
+               
+                if (anim["Armature|Bend_Stick"].time > 0.037f)
+                {
+                    ReleaseForceForRocketman = Mathf.Clamp(Mathf.Abs(swerveAmount), 0.1f, 1.2f);
+                    swipeDelta = 0;
+
+                    anim["Armature|Bend_Stick"].speed = 1;
+                    anim.Play("Armature|Release_Stick");
+                    isStickReleased = true;
+                }
             }
 
 
         }
 
     }
-
+    /// <summary>
+    /// Stick bending animation plays according to the swipe amount.
+    /// </summary>
+    /// <param name="time"></param>
     public void StickAnimationFrameJump(float time)
     {
         anim["Armature|Bend_Stick"].time = time;
         anim["Armature|Bend_Stick"].speed = 0;
         anim.Play("Armature|Bend_Stick");
+    }
+    /// <summary>
+    /// Game starts with the default settings.
+    /// </summary>
+    public void SetGameDefaultSettings()
+    {
+        isStickReleased = false;
+        anim["Armature|Bend_Stick"].speed = 0;
+        anim["Armature|Bend_Stick"].time = 0;
+        anim.Play("Armature|Bend_Stick");
+       
+       
     }
 }
